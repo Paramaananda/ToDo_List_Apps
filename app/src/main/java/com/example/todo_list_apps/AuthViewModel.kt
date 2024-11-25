@@ -79,8 +79,6 @@ class AuthViewModel : ViewModel() {
         auth.signOut()
         _authState.value = Authstate.Unauthenticated
     }
-
-
 }
 
 sealed class Authstate {
