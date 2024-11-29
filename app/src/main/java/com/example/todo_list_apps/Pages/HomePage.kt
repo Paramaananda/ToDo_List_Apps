@@ -7,7 +7,7 @@ import com.example.todo_list_apps.AuthViewModel
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -22,7 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todo_list_apps.Authstate
 import com.example.todo_list_apps.ui.theme.urbanistFontFamily
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.auth.AuthState
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.todo_list_apps.R
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,105 +37,145 @@ fun HomePage(
 ) {
     val authState = authViewModel?.authState?.observeAsState()
 
-    LaunchedEffect(authState?.value) {
-        when (authState?.value) {
-            is Authstate.Unauthenticated -> navController?.navigate("login")
-            else -> Unit
-        }
-    }
-    // State untuk daftar tugas dan input pengguna
+//    LaunchedEffect(authState?.value) {
+//        when (authState?.value) {
+//            is Authstate.Unauthenticated -> navController?.navigate("login")
+//            else -> Unit
+//        }
+//    }
+
+    // State untuk data tugas
     var newTask by remember { mutableStateOf(TextFieldValue("")) }
     val taskList = remember { mutableStateListOf<String>() }
 
     Scaffold(
-        modifier = Modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "TaskFlow",
-                        fontFamily = urbanistFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                },
-                actions = {
-                    TextButton(onClick = {
-                        authViewModel?.signout()
-                        navController?.navigate("signin")
-                    }) {
-                        Text(
-                            text = "Sign Out",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Your Tasks",
-                fontFamily = urbanistFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            // Input tugas baru
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color(0xFF00A3FF),
+                contentColor = Color.Black
             ) {
-                BasicTextField(
-                    value = newTask,
-                    onValueChange = { newTask = it },
+                Text(
+                    text = "TaskFlow",
+                    fontFamily = urbanistFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 8.dp)
-                        .height(56.dp)
-                        .background(
-                            Color.LightGray,
-                            MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(
-                        color = Color.Black,
-                        fontFamily = urbanistFontFamily
-                    )
+                        .padding(start = 16.dp)
                 )
-                Button(
-                    onClick = {
-                        if (newTask.text.isNotBlank()) {
-                            taskList.add(newTask.text)
-                            newTask = TextFieldValue("")
-                        }
-                    },
-                    modifier = Modifier.height(56.dp)
-                ) {
-                    Text(text = "Add")
+                TextButton(onClick = {
+                    authViewModel?.signout()
+                    navController?.navigate("signin")
+                }) {
+                    Text(
+                        text = "Sign Out",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
                 }
             }
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(paddingValues)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ornamen),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                val currentState = authState?.value
+                if (currentState is Authstate.Authenticated) {
 
-            // Daftar tugas
-            if (taskList.isEmpty()) {
-                Text(
-                    text = "You don't have any tasks yet.",
-                    fontFamily = urbanistFontFamily,
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    Text(
+                        text = "Selamat Datang",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+
+                    Text(
+                        text = currentState.email ?: "User",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    )
+                }
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    thickness = 1.dp,
                     color = Color.Gray
                 )
-            } else {
-                LazyColumn {
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Text(
+                    text = "Your Tasks",
+                    fontFamily = urbanistFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // Input tugas baru
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = newTask,
+                        onValueChange = { newTask = it },
+                        shape = RoundedCornerShape(25.dp),
+                        modifier = Modifier.weight(1f),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = Color(0xFF00A3FF),
+                            unfocusedBorderColor = Color.Gray,
+                            focusedTextColor = Color.Black,
+                            cursorColor = Color.Black,
+                            focusedLabelColor = Color.Black,
+                            unfocusedLabelColor = Color.Gray
+                        ),
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(
+                            color = Color.Black,
+                            fontFamily = urbanistFontFamily
+                        )
+                    )
+                    Button(
+                        onClick = {
+                            if (newTask.text.isNotBlank()) {
+                                taskList.add(newTask.text)
+                                newTask = TextFieldValue("")
+                            }
+                        },
+                        modifier = Modifier.height(56.dp)
+                    ) {
+                        Text(text = "Add")
+                    }
+                }
+
+                // Daftar tugas
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
                     items(taskList.size) { index ->
                         TaskItem(
                             task = taskList[index],
@@ -173,5 +217,8 @@ fun TaskItem(task: String, onDelete: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun HomePagePreview() {
-    HomePage()
+    HomePage(
+        navController = null,
+        authViewModel = null
+    )
 }

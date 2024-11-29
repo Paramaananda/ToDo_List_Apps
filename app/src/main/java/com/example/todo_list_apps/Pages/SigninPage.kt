@@ -256,9 +256,6 @@ fun SigninPage(
     }
 }
 
-
-
-
 @Preview(showBackground = true)
 @Composable
 fun SigninPagePreview(){
