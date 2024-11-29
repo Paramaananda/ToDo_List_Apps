@@ -208,7 +208,6 @@ fun ToDoListPage(
                             itemsIndexed(it) { index: Int, item: ToDo ->
                                 ToDoItem(item = item, onDelete = {
                                     todoViewModel.deleteToDo(item.id)
-                                    todoViewModel.getAllToDo()
                                 })
                             }
                         }

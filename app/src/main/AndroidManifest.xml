@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ToDo_List_Apps.LightMode"
+        android:name=".MainApplication"
         tools:targetApi="31">
 
         <activity

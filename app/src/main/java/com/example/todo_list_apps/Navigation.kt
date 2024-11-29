@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.todo_list_apps.Pages.HomePage
 import com.example.todo_list_apps.Pages.SigninPage
 import com.example.todo_list_apps.Pages.SignUpPage
 import com.example.todo_list_apps.Pages.ToDoListPage
