@@ -65,8 +65,6 @@ fun ToDoListPage(
     navController: NavController? = null,
     authViewModel: AuthViewModel? = null
 ) {
-
-
     val authState = authViewModel?.authState?.observeAsState()
 
     LaunchedEffect(authState?.value) {
@@ -106,7 +104,6 @@ fun ToDoListPage(
                         fontFamily = urbanistFontFamily
                     )
                 }
-
             }
         }
     ) { paddingValues ->
@@ -131,7 +128,6 @@ fun ToDoListPage(
             ) {
                 val currentState = authState?.value
                 if (currentState is Authstate.Authenticated) {
-
                     Spacer(modifier = Modifier.height(30.dp))
 
                     Text(
@@ -193,29 +189,34 @@ fun ToDoListPage(
                     )
                     Button(
                         onClick = {
-                            todoViewModel.addToDo(inputText)
-                            inputText = ""
+                            if (inputText.isNotBlank()) {
+                                todoViewModel.addToDo(inputText)
+                                inputText = ""
+                            }
                         },
-//                modifier = Modifier.height(56.dp)
                     ) {
-                        Text(text = "Add",
-                            fontFamily = urbanistFontFamily)
+                        Text(
+                            text = "Add",
+                            fontFamily = urbanistFontFamily
+                        )
                     }
                 }
                 todoList?.let {
                     LazyColumn(
                         content = {
-                            itemsIndexed(it) { index: Int, item: ToDo ->
-                                ToDoItem(item = item, onDelete = {
-                                    todoViewModel.deleteToDo(item.id)
-                                    todoViewModel.getAllToDo()
-                                })
+                            itemsIndexed(it) { _, item: ToDo ->
+                                ToDoItem(
+                                    item = item,
+                                    onDelete = {
+                                        // Use documentId for deletion
+                                        todoViewModel.deleteToDo(item.documentId)
+                                    }
+                                )
                             }
                         }
                     )
                 } ?: Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     text = "No items yet",
                     fontSize = 16.sp,
@@ -225,7 +226,6 @@ fun ToDoListPage(
         }
     }
 }
-
 @Composable
 fun ToDoItem(item: ToDo, onDelete: () -> Unit) {
     Row(
@@ -267,7 +267,6 @@ fun ToDoItem(item: ToDo, onDelete: () -> Unit) {
                 contentDescription = "Delete",
                 tint = Color.Red,
             )
-
         }
     }
 }
