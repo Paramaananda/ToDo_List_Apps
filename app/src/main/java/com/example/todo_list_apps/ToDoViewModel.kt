@@ -1,23 +1,15 @@
 package com.example.todo_list_apps
-
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.time.Instant
-import java.util.Date
-
-
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import java.util.Date
 
 
 class ToDoViewModel : ViewModel() {
@@ -29,28 +21,23 @@ class ToDoViewModel : ViewModel() {
     private var listenerRegistration: ListenerRegistration? = null
 
     init {
-        // Observe auth state changes to fetch todos for the current user
         auth.addAuthStateListener { firebaseAuth ->
             fetchTodos(firebaseAuth.currentUser?.uid)
         }
     }
 
     private fun fetchTodos(userId: String?) {
-        // Cancel previous listener if exists
         listenerRegistration?.remove()
 
-        // If no user is logged in, clear the todo list
         if (userId == null) {
             _todoList.value = listOf()
             return
         }
 
-        // Create a new listener for the specific user's todos
         listenerRegistration = firestore.collection("todos")
             .whereEqualTo("userId", userId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    // Handle error (you might want to log this or show a toast)
                     _todoList.value = listOf()
                     return@addSnapshotListener
                 }
@@ -60,7 +47,8 @@ class ToDoViewModel : ViewModel() {
                         id = document.id.hashCode(),
                         title = document.getString("title") ?: "",
                         createdAt = document.getDate("createdAt") ?: Date(),
-                        documentId = document.id
+                        documentId = document.id,
+                        isCompleted = document.getBoolean("isCompleted") ?: false
                     )
                 } ?: listOf()
 
@@ -74,13 +62,13 @@ class ToDoViewModel : ViewModel() {
             val todo = hashMapOf(
                 "title" to title,
                 "createdAt" to Date(),
-                "userId" to user.uid
+                "userId" to user.uid,
+                "isCompleted" to false
             )
 
             viewModelScope.launch(Dispatchers.IO) {
                 firestore.collection("todos")
                     .add(todo)
-                // Snapshot listener will handle updating the list
             }
         }
     }
@@ -90,13 +78,54 @@ class ToDoViewModel : ViewModel() {
             firestore.collection("todos")
                 .document(documentId)
                 .delete()
-            // Snapshot listener will handle updating the list
+        }
+    }
+
+    fun addToDoWithImage(title: String, imageUri: Uri?) {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val todo = hashMapOf(
+                "title" to title,
+                "createdAt" to Date(),
+                "userId" to user.uid,
+                "isCompleted" to false,
+                "imageUri" to imageUri?.toString()
+            )
+
+            viewModelScope.launch(Dispatchers.IO) {
+                firestore.collection("todos")
+                    .add(todo)
+            }
+        }
+    }
+
+    // Update ToDo data class to include optional image
+    fun updateToDo(documentId: String, newTitle: String, imageUri: Uri? = null) {
+        val updates = mutableMapOf<String, Any>(
+            "title" to newTitle
+        )
+
+        imageUri?.let {
+            updates["imageUri"] = it.toString()
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            firestore.collection("todos")
+                .document(documentId)
+                .update(updates)
+        }
+    }
+
+    fun toggleToDoCompletion(documentId: String, isCompleted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            firestore.collection("todos")
+                .document(documentId)
+                .update("isCompleted", isCompleted)
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        // Unregister the listener when the ViewModel is cleared
         listenerRegistration?.remove()
     }
 }

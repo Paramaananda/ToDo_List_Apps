@@ -53,7 +53,9 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.coil.kt.coil.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -73,10 +75,11 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 //    implementation 'com.google.firebase:firebase-auth-ktx:22.3.0'
 //    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1'
-
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
