@@ -52,7 +52,20 @@ android {
     }
 }
 
+val cameraxVersion = "1.3.0"
+
 dependencies {
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.compose.material:material-icons-core:1.5.4")
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("com.google.guava:guava:32.1.3-android")
+    implementation(libs.androidx.camera.core.v130)
+    implementation(libs.androidx.camera.camera2.v130)
+    implementation(libs.androidx.camera.lifecycle.v130)
+    implementation(libs.androidx.camera.view.v130)
+    implementation(libs.androidx.camera.extensions.v130)
     implementation(libs.coil.kt.coil.compose)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
